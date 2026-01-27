@@ -1,0 +1,10 @@
+{
+  "name": "demo-pu",
+  "resource": "demo-pu.jar",
+  "topology": {
+    "schema": "partitioned",
+    "partitions": 1,
+    "backupsPerPartition": 0
+  },
+  "contextProperties": {}
+}

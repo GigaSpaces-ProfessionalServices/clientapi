@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  xap-server:
+    image: gigaspaces/smart-cache-enterprise:17.1.4
+    command: host run-agent --manager --gsc=1
+    environment:
+      GS_LICENSE: "tryme"
+      GS_NIC_ADDRESS: "#local:ip#"
+      GS_OPTIONS_EXT: "-Dcom.gs.smart-externalizable.enabled=${com.gs.smart-externalizable.enabled}"
+    network_mode: host  # Use this as communication may occur on non-standard ports
+#    ports:
+#      - "8090:8090"
+#      - "4174:4174"
