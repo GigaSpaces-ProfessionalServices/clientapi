@@ -48,7 +48,7 @@ public class ManagerReadyTest {
     @Test
     @Order(2)
     void testLookupLocatorsSystemProperty() {
-        String expected = ClientConfigLoader.getProperty("com.gs.jini_lus.locators");
+        String expected = ClientConfigLoader.getProperty("xapManagerHost") + ":" + DockerTestEnv.XAP_LOOKUP_PORT;
         String actual = System.getProperty("com.gs.jini_lus.locators");
         assertEquals(expected, actual,
                 String.format("Lookup locators system property should be set: expected=%s, actual=%s", expected, actual));
@@ -75,7 +75,6 @@ public class ManagerReadyTest {
     void xapServerServiceIsRunningAndCorrectHostConfigured() throws Exception {
         // Collect results from both checks so we can report all failures
         String restApiError = null;
-        String hostConfigError = null;
 
         // Check 1: XAP Manager REST API is accessible
         try {
@@ -89,15 +88,14 @@ public class ManagerReadyTest {
         }
 
         // Check 2: Verify correct xapManagerHost in container logs
-        hostConfigError = verifyXapManagerHostInLogs();
+        final String hostConfigError = verifyXapManagerHostInLogs();
 
         // Report all failures together using assertAll
         final String finalRestApiError = restApiError;
-        final String finalHostConfigError = hostConfigError;
 
         assertAll(
                 () -> assertNull(finalRestApiError, finalRestApiError),
-                () -> assertNull(finalHostConfigError, finalHostConfigError)
+                () -> assertNull(hostConfigError, hostConfigError)
         );
     }
 
@@ -165,20 +163,23 @@ public class ManagerReadyTest {
         }
 
         // Build error message with hint for correct host
-        String hostHint = String.format("%sCheck the docker logs to confirm the correct xap manager host. Look for jini://<host name>:4174", System.lineSeparator());
-        String regex = ".*(LUS INFO \\[com.sun.jini.reggie.GigaRegistrar\\] - Started Lookup Service.*locator=jini://(.*):4174/]).*";
+        // Example log snippet:
+        // 2026-01-29 23:24:03,891 LUS INFO [com.sun.jini.reggie.GigaRegistrar] - Started Lookup Service [duration=0.681s, groups=[xap-17.1.4], service-id=607d9019-ec68-4409-b6a6-4194f5656f93, locator=jini://127.0.1.1:4174/]
+        String hostHint = String.format("%sCheck the docker logs to confirm the correct xap manager host. Look for jini://<host name>:%s", System.lineSeparator(), DockerTestEnv.XAP_LOOKUP_PORT);
+        String regex = String.format("(LUS INFO \\[com.sun.jini.reggie.GigaRegistrar\\] - Started Lookup Service.*?locator=jini://([\\w\\.-]*):%d/])", DockerTestEnv.XAP_LOOKUP_PORT);
         Pattern pattern = Pattern.compile(regex);
         if (logs != null) {
             Matcher matcher = pattern.matcher(logs);
             if (matcher.find()) {
-                hostHint = String.format("%sPlease try with xapManagerHost: %s%s\nPlease refer to message: %s",
+                hostHint = String.format("%sPlease try with xapManagerHost: %s%sPlease refer to message: %s",
                         System.lineSeparator(), matcher.group(2), System.lineSeparator(), matcher.group(1));
             }
         }
 
-        return String.format("%s%n%nContainer logs should contain the Lookup Service locator pattern '%s' within %d seconds. " +
+        return String.format("%s%sContainer logs should contain the Lookup Service locator pattern '%s' within %d seconds. " +
                         "Please confirm the xapManagerHost is correct",
                 hostHint,
+                System.lineSeparator(),
                 expectedLocatorPattern,
                 (maxRetries * retryDelayMs) / 1000);
     }

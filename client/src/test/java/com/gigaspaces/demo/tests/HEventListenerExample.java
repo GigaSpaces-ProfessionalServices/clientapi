@@ -1,25 +1,27 @@
 package com.gigaspaces.demo.tests;
 
+
 import com.gigaspaces.demo.client.WriteReadExample;
 import com.gigaspaces.demo.common.Data;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openspaces.core.GigaSpace;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Integration test for WriteReadExample using Data POJO.
+ * Integration test for testing PollingContainer using Data POJO.
  */
 @ExtendWith(RemoteProxyExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class AWriteReadExampleTest {
-
+public class HEventListenerExample {
     private GigaSpace gigaSpace;
-    private WriteReadExample writeReadExample;
     private static final int NUM_RECORDS = 10;
+
+    // Need the writeObjects method from this class
+    private WriteReadExample writeReadExample;
 
     @BeforeAll
     void beforeAll() {
@@ -39,17 +41,11 @@ public class AWriteReadExampleTest {
 
     @Test
     @Order(2)
-    void queryWithReadMultiple() {
-        Data[] results = writeReadExample.queryWithReadMultiple();
-
-        assertNotNull(results, "Results should not be null");
-        assertEquals(NUM_RECORDS, results.length, "Should return " + NUM_RECORDS + " objects");
-
-        for (Data result : results) {
-            assertNotNull(result.getId(), "ID should not be null");
-            assertNotNull(result.getMessage(), "Message should not be null");
-            // polling container added
-            //assertEquals(Boolean.FALSE, result.getProcessed(), "Processed should be false");
-        }
+    void verifyPollingContainer() {
+        Data data = new Data();
+        data.setId(1);
+        Data dataRead = gigaSpace.read(data);
+        assertTrue("Processed should be true in the Data object read", dataRead.getProcessed());
     }
+
 }

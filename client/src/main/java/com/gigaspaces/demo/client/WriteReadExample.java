@@ -5,7 +5,6 @@ import com.j_spaces.core.client.SQLQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class WriteReadExample extends Client {
 
     private static final Logger logger = LoggerFactory.getLogger(WriteReadExample.class);

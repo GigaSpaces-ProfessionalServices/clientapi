@@ -23,7 +23,7 @@ public class LocalViewExample extends Client {
         this.localView = localView;
     }
     @Override
-    public void initialize() {
+    public void initialize() throws Exception {
         super.initialize();
         SpaceProxyConfigurer configurer = new SpaceProxyConfigurer(Client.SPACE_NAME);
         gigaSpace = new GigaSpaceConfigurer(configurer).gigaSpace();
@@ -44,7 +44,7 @@ public class LocalViewExample extends Client {
         }
     }
 
-    public Object doReadFromLocalView() {
+    public Object readFromLocalView() {
 
 
         /*
@@ -60,12 +60,12 @@ public class LocalViewExample extends Client {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         LocalViewExample example = new LocalViewExample();
         example.initialize();
         try {
             example.populate(10);
-            example.doReadFromLocalView();
+            example.readFromLocalView();
 
             Thread.sleep(300000);
         } catch (InterruptedException ie) {

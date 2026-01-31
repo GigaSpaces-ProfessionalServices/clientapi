@@ -1,5 +1,6 @@
 package com.gigaspaces.demo.tests;
 
+import com.gigaspaces.demo.ClientConfigLoader;
 import com.gigaspaces.demo.client.DistributedTaskExample;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ public class BDistributedTaskExample {
         long result = distributedTaskExample.runDistributedTask();
 
         assertNotNull(result, "Result should not be null");
-        assertEquals(1L, result, "Result should equal number of primary partitions");
+        long expected = Long.valueOf(ClientConfigLoader.getProperty("numberOfPartitions"));
+        assertEquals(expected, result, "Result should equal number of primary partitions");
     }
 }

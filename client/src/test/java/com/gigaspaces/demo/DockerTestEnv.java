@@ -1,5 +1,7 @@
 package com.gigaspaces.demo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.DockerComposeContainer;
 
 import java.io.File;
@@ -11,6 +13,8 @@ import java.time.Duration;
  * across multiple test classes.
  */
 public class DockerTestEnv {
+
+    private static final Logger logger = LoggerFactory.getLogger(DockerTestEnv.class);
 
     public static final String XAP_SERVICE = "xap-server";
     public static final String SPACE_NAME = com.gigaspaces.demo.client.Client.SPACE_NAME;

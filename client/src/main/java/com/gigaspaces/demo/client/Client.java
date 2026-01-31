@@ -17,7 +17,7 @@ public class Client {
     public Client() {
     }
 
-    public void initialize() {
+    public void initialize() throws Exception {
         SpaceProxyConfigurer configurer = new SpaceProxyConfigurer(SPACE_NAME);
         gigaSpace = new GigaSpaceConfigurer(configurer).gigaSpace();
     }
