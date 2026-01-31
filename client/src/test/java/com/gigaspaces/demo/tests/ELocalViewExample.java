@@ -54,7 +54,7 @@ public class ELocalViewExample {
 
         localViewExample.setLocalView(localView);
 
-        Object object = localViewExample.doReadFromLocalView();
+        Object object = localViewExample.readFromLocalView();
 
         assertNotNull(object, "Object read from local view should not be null");
     }

@@ -10,8 +10,8 @@ import com.gigaspaces.demo.tests.*;
  * Test suite that runs integration tests in the correct order:
  * 1. ManagerReadyTest - starts the XAP server container
  * 2. PuDeploymentTest - deploys and verifies the "demo" space
- * 3. AWriteReadExampleTest - connects to space and performs basic operations
- * 4. BDistributedTaskExample - executes a distributed task
+ * 3. A-G tests - client API examples against the demo space
+ * 4. HEventListenerExample - event listener tests
  * 5. CleanupTest - undeploys PU and stops the environment
  *
  * Run with: mvn test -Dtest=IntegrationTestSuite
@@ -26,6 +26,9 @@ import com.gigaspaces.demo.tests.*;
     CAggregatorExample.class,
     DChangeExample.class,
     ELocalViewExample.class,
+    FJdbcV3Example.class,
+    GCustomAggregatorExample.class,
+    HEventListenerExample.class,
     CleanupTest.class
 })
 class IntegrationTestSuite {

@@ -1,17 +1,18 @@
-# clientapi
-A test framework for integration testing with GigaSpaces API.
+
 
 
 ##### GigaSpaces server version
-1. Set the GigasSpaces server version used by docker-compose.
+1. Set the GigasSpaces server version used by docker-compose. Refer to `gigaspaces/smart-cache-enterprise:<version>`.
    [docker-compose-test.yaml.templ](client/src/test/resources/docker-compose-test.yaml.templ)
 
 ##### GigaSpaces client version
 1. Set the `gigaspaces.client.version` in the main `pom.xml`.
 
-##### client Java version
+##### Client Java version
 1. The pom.xml contains the `maven.compiler.source` and `maven.compiler.target`. 
 2. The Java version of the client is determined by the JVM used to run the tests in scripts/runTests.sh.
+
+Note: The Java server version is determined by the GigaSpaces docker image `gigaspaces/smart-cache-enterprise`.
 
 ##### Execution flow
 1. The [preprocessor](preprocessor/src/main/java/com/gigaspaces/demo/Main.java) is responsible for replacing placeholders and generating configuration files.  
@@ -29,4 +30,4 @@ A test framework for integration testing with GigaSpaces API.
 3. Each of the tests has a corresponding example. For example, BDistributedTaskExample uses DistributedTaskExample. The reason is JUnit tests introduce a lot of boilerplate code. It is convenient to have the basic code intact, so you can easily read, modify, run from the IDE, and share the code.
 
 #####
-TODO - containerize JDK for client or make setting client Java versions easier.
+IDEAS - containerize JDK for client or make setting client Java versions easier.

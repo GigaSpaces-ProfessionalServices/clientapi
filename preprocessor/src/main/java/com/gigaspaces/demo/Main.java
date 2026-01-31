@@ -7,70 +7,104 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Main {
     public static final String SMART_EXTERNALIZABLE = "com.gs.smart-externalizable.enabled";
+    public static final String NUM_PARTITIONS = "numberOfPartitions";
     private Path projectHome;
     private Path configFilePath;
     private Properties properties = new Properties();
-
+    String dockerComposeTest = "";
+    String testConfig = "";
 
     private void processSmartExternalizable(String smartExternalizableReplaceValue) {
         // 1. docker-compose-test.yaml
-        generateFile("client/src/test/resources/docker-compose-test.yaml.templ",
-                "client/src/test/resources/docker-compose-test.yaml",
+        dockerComposeTest = generateFile("client/src/test/resources/docker-compose-test.yaml.templ",
+                "client/src/test/resources/docker-compose-test.yaml", null,
                 SMART_EXTERNALIZABLE, smartExternalizableReplaceValue);
         // 2. test-config.properties
-        generateFile("client/src/test/resources/test-config.properties.templ",
-                "client/src/test/resources/test-config.properties",
+        testConfig = generateFile("client/src/test/resources/test-config.properties.templ",
+                "client/src/test/resources/test-config.properties", null,
                 SMART_EXTERNALIZABLE, smartExternalizableReplaceValue);
 
     }
-    private void generateFile(String templateFilePath, String outputFilePath, String searchStr, String replaceValue) {
+    private void processNumberOfPartitions(String numberOfPartitionsReplaceValue) {
+        // 1. docker-compose-test.yaml
+        generateFile(null,
+                "client/src/test/resources/docker-compose-test.yaml", dockerComposeTest,
+                NUM_PARTITIONS, numberOfPartitionsReplaceValue);
 
+        // 2. test-config.properties
+        generateFile(null,
+                "client/src/test/resources/test-config.properties", testConfig,
+                NUM_PARTITIONS, numberOfPartitionsReplaceValue);
+
+        // 3. deploy-pu-request.json
+        generateFile("client/src/test/resources/deploy-pu-request.json.templ",
+                "client/src/test/resources/deploy-pu-request.json", null,
+                NUM_PARTITIONS, numberOfPartitionsReplaceValue);
+    }
+
+    private String openTemplateFile(String templateFilePath) {
         Path template = projectHome.resolve(templateFilePath);
-        Path outputFilename = projectHome.resolve(outputFilePath);
+        String sTemplate = null;
 
-        String content = null;
-
-        // Read the file)
+        // Read the file
         try (Stream<String> lines = Files.lines(Paths.get(template.toString() ))) {
-            String sTemplate = lines.collect(Collectors.joining(System.lineSeparator()));
+            sTemplate = lines.collect(Collectors.joining(System.lineSeparator()));
             System.out.println(sTemplate);
-
-            // Search and replace in string
-            content = sTemplate.replace(String.format("${%s}", searchStr), replaceValue);
-
-            // Files.write()
+            return sTemplate;
         } catch (IOException e) {
             // Handle I/O exceptions, such as the file not being found
             System.err.println("Error reading file: " + e.getMessage());
             e.printStackTrace();
         }
+        return sTemplate;
+    }
+    private String generateFile(String templateFilePath, String outputFilePath, String previousOutput, String searchStr, String replaceValue) {
+
+        String sTemplate = null;
+        if (previousOutput != null && ! previousOutput.equals("")) {
+            sTemplate = previousOutput;
+        }
+        else {
+            sTemplate = openTemplateFile(templateFilePath);
+        }
+        // Search and replace in string
+        String content = sTemplate.replace(String.format("${%s}", searchStr), replaceValue);
+
+        Path outputFilename = projectHome.resolve(outputFilePath);
+
         try (FileWriter fw = new FileWriter(outputFilename.toString());
              BufferedWriter bw = new BufferedWriter(fw)) {
 
             bw.write(content);
-
         } catch (IOException e) {
             System.err.println("An error occurred: " + e.getMessage());
             e.printStackTrace();
         }
-
+        return content;
     }
 
     private void preprocess() {
         System.out.println("The properties file contains: ");
-        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-            String key = (String) entry.getKey();
-            String value = (String) entry.getValue();
+        Set<String> keys = properties.stringPropertyNames();
+        List<String> sortedKeys = new ArrayList<>(keys);
+        // Sort the list of keys
+        Collections.sort(sortedKeys);
+
+        // Since keys are sorted, they always get processed in the same order
+        for (String key : sortedKeys) {
+
+            String value = (String) properties.getProperty(key);
             System.out.println(String.format("  <K,V>: %s, %s", key, value));
             if (SMART_EXTERNALIZABLE.equals(key)) {
                 processSmartExternalizable(value);
+            } else if (NUM_PARTITIONS.equals(key)) {
+                processNumberOfPartitions(value);
             }
         }
     }
@@ -134,6 +168,5 @@ public class Main {
         main.processArgs(args);
         main.displayArgs();
         main.preprocess();
-
     }
 }

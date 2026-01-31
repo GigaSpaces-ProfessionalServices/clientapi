@@ -25,13 +25,13 @@ export MODEL_DIR="$PROJ_DIR/common/target/classes"
 
 export CLASSES_DIR="$PROJ_DIR/client/target/classes"
 
-export CLASSPATH=$GIGA/lib/required/*
+export CLASSPATH="$GIGA/lib/required/*"
 
-export CLASSPATH=$CLASSPATH:$GIGA/lib/optional/near-cache/*
+export CLASSPATH="$CLASSPATH:$GIGA/lib/optional/near-cache/*"
 
-export CLASSPATH=$CLASSPATH:$MODEL_DIR
+export CLASSPATH="$CLASSPATH:$MODEL_DIR"
 
-export CLASSPATH=$CLASSPATH:$CLASSES_DIR
+export CLASSPATH="$CLASSPATH:$CLASSES_DIR"
 
 export GS_LOOKUP_LOCATORS="localhost"
 export GS_LOOKUP_GROUPS="xap-17.1.0"
