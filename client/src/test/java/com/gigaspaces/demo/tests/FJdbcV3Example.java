@@ -25,7 +25,7 @@ public class FJdbcV3Example {
     void beforeAll() throws Exception {
         jdbcV3Example = new JdbcV3Example();
         jdbcV3Example.setGigaSpace(gigaSpace);
-        jdbcV3Example.setLookupHost(DockerTestEnv.getLookupHost());
+        jdbcV3Example.setLookupHost(DockerTestEnv.getInstance().getLookupHost());
         Connection connection = jdbcV3Example.connect();
         jdbcV3Example.setConnection(connection);
         jdbcV3Example.populate();

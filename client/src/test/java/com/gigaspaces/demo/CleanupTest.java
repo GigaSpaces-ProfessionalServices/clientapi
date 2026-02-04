@@ -31,7 +31,7 @@ public class CleanupTest {
     @Test
     @Order(1)
     void undeployPu() throws Exception {
-        String baseUrl = DockerTestEnv.getManagerBaseUrl();
+        String baseUrl = DockerTestEnv.getInstance().getManagerBaseUrl();
         String undeployUrl = baseUrl + "/v2/pus/" + DockerTestEnv.PU_NAME;
 
         HttpResponse response = deleteWithRetry(undeployUrl, 10, 2000);
@@ -43,8 +43,8 @@ public class CleanupTest {
     @Test
     @Order(2)
     void stopEnvironment() {
-        DockerTestEnv.stop();
-        assertTrue(!DockerTestEnv.isStarted(), "Environment should be stopped");
+        DockerTestEnv.getInstance().stop();
+        assertTrue(!DockerTestEnv.getInstance().isStarted(), "Environment should be stopped");
     }
 
     private HttpResponse deleteWithRetry(String urlString, int maxRetries, int delayMs) throws Exception {

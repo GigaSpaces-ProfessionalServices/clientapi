@@ -1,6 +1,6 @@
 services:
   xap-server:
-    image: gigaspaces/smart-cache-enterprise:17.1.5
+    image: gigaspaces/smart-cache-enterprise:${gsServerVersion}
     command: host run-agent --manager --gsc=${numberOfPartitions}
     environment:
       GS_LICENSE: "tryme"

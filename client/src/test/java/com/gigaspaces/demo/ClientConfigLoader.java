@@ -38,5 +38,20 @@ public class ClientConfigLoader {
         System.clearProperty("com.gs.jini_lus.groups");
         System.clearProperty("com.gs.jini_lus.locators");
     }
+
+    public static void printConfigSummary() {
+        // Use System.out.println as logger is dependent upon the logger that was bundled with gigaspaces
+        // logger dependencies have changed, for example from 16.x - 17.x
+        System.out.println("=".repeat(60));
+        System.out.println("TEST CLIENT CONFIGURATION SUMMARY");
+        System.out.println("=".repeat(60));
+        properties.stringPropertyNames().stream()
+                .sorted()
+                .forEach(key -> System.out.println("  " + key + " = " + properties.getProperty(key)));
+        System.out.println("-".repeat(60));
+        System.out.println("Derived system properties:");
+        System.out.println("  com.gs.jini_lus.locators = " + getProperty("xapManagerHost") + ":" + DockerTestEnv.XAP_LOOKUP_PORT);
+        System.out.println("=".repeat(60));
+    }
 }
 

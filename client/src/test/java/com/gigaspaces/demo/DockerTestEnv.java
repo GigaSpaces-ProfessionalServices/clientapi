@@ -23,15 +23,25 @@ public class DockerTestEnv {
     public static final int XAP_LOOKUP_PORT = 4174;
     private static final String XAP_MANAGER_HOST;
 
-    private static DockerComposeContainer<?> environment;
-    private static boolean started = false;
+    private DockerComposeContainer<?> environment;
+    private boolean started = false;
+    private static DockerTestEnv dockerTestEnv = null;
 
     static {
         XAP_MANAGER_HOST = ClientConfigLoader.getProperty("xapManagerHost");
-        Runtime.getRuntime().addShutdownHook(new Thread(DockerTestEnv::stop));
+        Runtime.getRuntime().addShutdownHook(new Thread(DockerTestEnv.getInstance()::stop));
     }
 
-    public static synchronized void start() {
+    private DockerTestEnv() {}
+
+    public static synchronized DockerTestEnv getInstance()
+    {
+        if (dockerTestEnv == null)
+            dockerTestEnv = new DockerTestEnv();
+        return dockerTestEnv;
+    }
+
+    public synchronized void start() {
         if (!started) {
             File dockerComposeFile;
             try {
@@ -54,50 +64,50 @@ public class DockerTestEnv {
         }
     }
 
-    public static synchronized void stop() {
+    public synchronized void stop() {
         if (environment != null && started) {
             environment.stop();
             started = false;
         }
     }
 
-    public static DockerComposeContainer<?> getEnvironment() {
+    public DockerComposeContainer<?> getEnvironment() {
         return environment;
     }
 
-    public static boolean isStarted() {
+    public boolean isStarted() {
         return started;
     }
 
-    public static String getManagerHost() {
+    public String getManagerHost() {
         ensureStarted();
         return XAP_MANAGER_HOST;
     }
 
-    public static int getManagerPort() {
+    public int getManagerPort() {
         ensureStarted();
         return XAP_MANAGER_PORT;
     }
 
-    public static String getManagerBaseUrl() {
+    public String getManagerBaseUrl() {
         return "http://" + getManagerHost() + ":" + getManagerPort();
     }
 
-    public static String getLookupHost() {
+    public String getLookupHost() {
         ensureStarted();
         return XAP_MANAGER_HOST;
     }
 
-    public static int getLookupPort() {
+    public int getLookupPort() {
         ensureStarted();
         return XAP_LOOKUP_PORT;
     }
 
-    public static String getLookupLocator() {
+    public String getLookupLocator() {
         return getLookupHost() + ":" + getLookupPort();
     }
 
-    private static void ensureStarted() {
+    private void ensureStarted() {
         if (!started) {
             throw new IllegalStateException("Test environment not started. Call start() first.");
         }

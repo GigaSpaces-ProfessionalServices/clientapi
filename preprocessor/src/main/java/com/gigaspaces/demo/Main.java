@@ -11,9 +11,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/*
+   This class is used to manage configurations that are related and may require configuration in multiple files.
+ */
 public class Main {
     public static final String SMART_EXTERNALIZABLE = "com.gs.smart-externalizable.enabled";
     public static final String NUM_PARTITIONS = "numberOfPartitions";
+    public static final String GS_SERVER_VERSION = "gsServerVersion";
+    public static final String XAP_LOOKUP_GROUPS = "xapLookupGroups";
     private Path projectHome;
     private Path configFilePath;
     private Properties properties = new Properties();
@@ -31,6 +36,12 @@ public class Main {
                 SMART_EXTERNALIZABLE, smartExternalizableReplaceValue);
 
     }
+    private void processGsServerVersion(String gsServerVersionValue) {
+        // 1. docker-compose-test.yaml
+        dockerComposeTest = generateFile(null,
+                "client/src/test/resources/docker-compose-test.yaml", dockerComposeTest,
+                GS_SERVER_VERSION, gsServerVersionValue);
+    }
     private void processNumberOfPartitions(String numberOfPartitionsReplaceValue) {
         // 1. docker-compose-test.yaml
         generateFile(null,
@@ -38,7 +49,7 @@ public class Main {
                 NUM_PARTITIONS, numberOfPartitionsReplaceValue);
 
         // 2. test-config.properties
-        generateFile(null,
+        testConfig = generateFile(null,
                 "client/src/test/resources/test-config.properties", testConfig,
                 NUM_PARTITIONS, numberOfPartitionsReplaceValue);
 
@@ -48,6 +59,12 @@ public class Main {
                 NUM_PARTITIONS, numberOfPartitionsReplaceValue);
     }
 
+    private void processXapLookupGroups(String lookupGroupsReplaceValue) {
+        // 1. test-config.properties
+        testConfig = generateFile(null,
+                "client/src/test/resources/test-config.properties", testConfig,
+                XAP_LOOKUP_GROUPS, lookupGroupsReplaceValue);
+    }
     private String openTemplateFile(String templateFilePath) {
         Path template = projectHome.resolve(templateFilePath);
         String sTemplate = null;
@@ -55,7 +72,7 @@ public class Main {
         // Read the file
         try (Stream<String> lines = Files.lines(Paths.get(template.toString() ))) {
             sTemplate = lines.collect(Collectors.joining(System.lineSeparator()));
-            System.out.println(sTemplate);
+            //System.out.println(sTemplate);
             return sTemplate;
         } catch (IOException e) {
             // Handle I/O exceptions, such as the file not being found
@@ -90,7 +107,7 @@ public class Main {
     }
 
     private void preprocess() {
-        System.out.println("The properties file contains: ");
+        //System.out.println("The properties file contains: ");
         Set<String> keys = properties.stringPropertyNames();
         List<String> sortedKeys = new ArrayList<>(keys);
         // Sort the list of keys
@@ -100,17 +117,31 @@ public class Main {
         for (String key : sortedKeys) {
 
             String value = (String) properties.getProperty(key);
-            System.out.println(String.format("  <K,V>: %s, %s", key, value));
+            //System.out.println(String.format("  <K,V>: %s, %s", key, value));
             if (SMART_EXTERNALIZABLE.equals(key)) {
                 processSmartExternalizable(value);
+            } else if (GS_SERVER_VERSION.equals(key)) {
+                processGsServerVersion(value);
             } else if (NUM_PARTITIONS.equals(key)) {
                 processNumberOfPartitions(value);
+            } else if (XAP_LOOKUP_GROUPS.equals(key)) {
+                processXapLookupGroups(value);
             }
         }
     }
     public void displayArgs() {
         System.out.println("projectHome is: " + projectHome);
         System.out.println("config.properties is located at: " + configFilePath);
+    }
+
+    public void printConfigSummary() {
+        System.out.println("=".repeat(60));
+        System.out.println("GLOBAL TEST CONFIGURATION SUMMARY");
+        System.out.println("=".repeat(60));
+        properties.stringPropertyNames().stream()
+                .sorted()
+                .forEach(key -> System.out.println("  " + key + " = " + properties.getProperty(key)));
+        System.out.println("-".repeat(60));
     }
     public void printUsage() {
         System.out.println("This program is used to set configurations.");
@@ -168,5 +199,6 @@ public class Main {
         main.processArgs(args);
         main.displayArgs();
         main.preprocess();
+        main.printConfigSummary();
     }
 }

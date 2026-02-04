@@ -25,9 +25,11 @@ public class ManagerReadyTest {
 
     @BeforeAll
     static void setUp() {
+        ClientConfigLoader.printConfigSummary();
+
         // Set properties BEFORE creating the space proxy (and before DockerTestEnv.start() which may trigger GigaSpaces class loading)
         ClientConfigLoader.setSystemProperties();
-        DockerTestEnv.start();
+        DockerTestEnv.getInstance().start();
     }
 
     @AfterAll
@@ -42,7 +44,7 @@ public class ManagerReadyTest {
     void allServicesAreRunning() {
         // With network_mode: host, verify service is running via REST API
         // The container check, i.e., getContainerByServiceName may not work reliably with host networking
-        assertTrue(DockerTestEnv.isStarted(), "Test environment should be started");
+        assertTrue(DockerTestEnv.getInstance().isStarted(), "Test environment should be started");
     }
 
     @Test
@@ -102,7 +104,7 @@ public class ManagerReadyTest {
     private int waitForManagerReady(Duration timeout) {
         long startTime = System.currentTimeMillis();
         long timeoutMs = timeout.toMillis();
-        String url = DockerTestEnv.getManagerBaseUrl() + "/v2/info";
+        String url = DockerTestEnv.getInstance().getManagerBaseUrl() + "/v2/info";
 
         while (System.currentTimeMillis() - startTime < timeoutMs) {
             try {
@@ -144,7 +146,7 @@ public class ManagerReadyTest {
         String logs = null;
 
         for (int i = 0; i < maxRetries; i++) {
-            Optional<ContainerState> containerOpt = DockerTestEnv.getEnvironment()
+            Optional<ContainerState> containerOpt = DockerTestEnv.getInstance().getEnvironment()
                     .getContainerByServiceName(DockerTestEnv.XAP_SERVICE + "_1");
 
             if (!containerOpt.isPresent()) {
