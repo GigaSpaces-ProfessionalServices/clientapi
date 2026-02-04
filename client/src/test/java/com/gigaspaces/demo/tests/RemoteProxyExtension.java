@@ -29,7 +29,7 @@ public class RemoteProxyExtension implements BeforeAllCallback, AfterAllCallback
             // Set properties BEFORE creating the space proxy (and before DockerTestEnv.start() which may trigger GigaSpaces class loading)
             ClientConfigLoader.setSystemProperties();
 
-            DockerTestEnv.start();
+            DockerTestEnv.getInstance().start();
 
             configurer = new SpaceProxyConfigurer(DockerTestEnv.SPACE_NAME)
                     .lookupTimeout(30000);

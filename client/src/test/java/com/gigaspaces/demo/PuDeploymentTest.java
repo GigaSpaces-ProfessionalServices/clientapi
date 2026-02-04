@@ -26,50 +26,65 @@ import static org.junit.jupiter.api.Assertions.*;
  * This test should run after ManagerReadyTest has started the environment.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PuDeploymentTest {
 
     private static final Logger logger = LoggerFactory.getLogger(PuDeploymentTest.class);
 
-    private static final String PU_JAR_NAME = "space-pu.jar";
+
+    /**
+     * Override this method in subclasses to change the module name.
+     * Default is "space".
+     */
+    protected String getStatefulModuleName() {
+        return "space";
+    }
+
+    /**
+     * Override this method in subclasses to change the PU jar name.
+     * Default is "demo-pu.jar".
+     */
+    protected String getPuJarName() {
+        return "demo-pu.jar";
+    }
 
     @BeforeAll
-    static void setUp() {
+    void setUp() {
         // Set properties BEFORE creating the space proxy (and before DockerTestEnv.start() which may trigger GigaSpaces class loading)
         ClientConfigLoader.setSystemProperties();
         // Ensure the shared environment is started
-        DockerTestEnv.start();
+        DockerTestEnv.getInstance().start();
     }
 
     @AfterAll
-    static void tearDown() {
+    void tearDown() {
         ClientConfigLoader.clearSystemProperties();
-        //System.clearProperty("com.gs.smart-externalizable.enabled");
-        // Environment cleanup is handled by CleanupTest which runs last
+
     }
 
     /* depending upon which method was used the pu jar will be in a slightly different relative location
        1. mvn test -pl client; working directory is client module
        2. java org.junit.platform.console.ConsoleLauncher; working directory is project root
      */
-    private static File findPuJar() {
+    private File findPuJar() {
         String[] searchPaths = {
-            "space/target",    // from project root
-            "../space/target" // from client module
+            getStatefulModuleName() + "/target",    // from project root
+            "../" + getStatefulModuleName() + "/target" // from client module
         };
         for (String dir : searchPaths) {
-            File jar = new File(dir, PU_JAR_NAME);
+            File jar = new File(dir, getPuJarName());
             if (jar.exists()) {
                 return jar;
             }
         }
-        throw new IllegalStateException(PU_JAR_NAME + " not found in any of the expected locations");
+        throw new IllegalStateException(getPuJarName() + " not found in any of the expected locations");
     }
 
 
     @Test
     @Order(1)
     void createOrReplacePu() throws Exception {
-        String baseUrl = DockerTestEnv.getManagerBaseUrl();
+        String baseUrl = DockerTestEnv.getInstance().getManagerBaseUrl();
 
         // create or replace processing unit
         // curl -X PUT --header 'Content-Type: multipart/form-data' --header 'Accept: text/plain' {"type":"formData"} 'http://localhost:8090/v2/pus/resources'
@@ -87,7 +102,7 @@ public class PuDeploymentTest {
     @Test
     @Order(2)
     void verifyPuExists() throws Exception {
-        String baseUrl = DockerTestEnv.getManagerBaseUrl();
+        String baseUrl = DockerTestEnv.getInstance().getManagerBaseUrl();
         String resourcesUrl = baseUrl + "/v2/pus/resources";
 
         // Wait for PU resource to be available and verify
@@ -102,7 +117,7 @@ public class PuDeploymentTest {
     @Test
     @Order(3)
     void deployPu() throws Exception {
-        String baseUrl = DockerTestEnv.getManagerBaseUrl();
+        String baseUrl = DockerTestEnv.getInstance().getManagerBaseUrl();
 
         // Deploy the PU using JSON body
         String deployUrl = baseUrl + "/v2/pus";
@@ -120,7 +135,7 @@ public class PuDeploymentTest {
     @Test
     @Order(4)
     void verifyPuIsDeployed() throws Exception {
-        String baseUrl = DockerTestEnv.getManagerBaseUrl();
+        String baseUrl = DockerTestEnv.getInstance().getManagerBaseUrl();
         String puUrl = baseUrl + "/v2/pus/" + DockerTestEnv.PU_NAME;
 
         // Wait for PU to be deployed and verify
@@ -135,7 +150,7 @@ public class PuDeploymentTest {
     @Test
     @Order(5)
     void verifySpaceIsDeployed() throws Exception {
-        String baseUrl = DockerTestEnv.getManagerBaseUrl();
+        String baseUrl = DockerTestEnv.getInstance().getManagerBaseUrl();
         String spaceUrl = baseUrl + "/v2/spaces/" + DockerTestEnv.SPACE_NAME;
 
         // Wait for space to be deployed and verify
@@ -150,7 +165,7 @@ public class PuDeploymentTest {
     @Test
     @Order(6)
     void verifySpaceIsDiscoverableViaJini() throws Exception {
-        String lookupLocator = DockerTestEnv.getLookupLocator();
+        String lookupLocator = DockerTestEnv.getInstance().getLookupLocator();
 
         // Retry logic to wait for the space to be discoverable via JINI lookup.
         // The REST API may report the space as deployed before JINI registration completes.
