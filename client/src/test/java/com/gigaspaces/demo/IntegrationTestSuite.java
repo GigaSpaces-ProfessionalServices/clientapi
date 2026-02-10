@@ -31,6 +31,7 @@ import com.gigaspaces.demo.tests.*;
     ELocalViewExample.class,
     FJdbcV3Example.class,
     GCustomAggregatorExample.class,
+    IBroadcastWriteReadExampleTest.class,
     //DockerRestartTest.class,
     //EventPuDeploymentTest.class,
     //HEventListenerExample.class,

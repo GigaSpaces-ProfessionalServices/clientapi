@@ -17,7 +17,6 @@ public class WriteReadExample extends Client {
 
     public Data[] queryWithReadMultiple() {
 
-        // Query all Data objects (mimics WriteReadExample.query())
         SQLQuery<Data> query = new SQLQuery<>(Data.class, "");
 
         Data[] results = gigaSpace.readMultiple(query);
