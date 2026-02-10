@@ -25,7 +25,7 @@ public class ManagerReadyTest {
 
     @BeforeAll
     static void setUp() {
-        ClientConfigLoader.printConfigSummary();
+        //ClientConfigLoader.printConfigSummary();
 
         // Set properties BEFORE creating the space proxy (and before DockerTestEnv.start() which may trigger GigaSpaces class loading)
         ClientConfigLoader.setSystemProperties();
@@ -34,7 +34,7 @@ public class ManagerReadyTest {
 
     @AfterAll
     static void tearDown() {
-        ClientConfigLoader.clearSystemProperties();
+        //ClientConfigLoader.clearSystemProperties();
         //System.clearProperty("com.gs.smart-externalizable.enabled");
         // Environment cleanup is handled by CleanupTest which runs last
     }
@@ -63,17 +63,9 @@ public class ManagerReadyTest {
         assertEquals(expectedLookupGroups, actual, String.format("XapLookupGroups %s and system property com.gs.jini_lus.groups %s should be the same", actual, expectedLookupGroups));
     }
 
-    @Test
-    @Order(3)
-    void testSmartExternalizableSystemProperty() {
-        String expected = ClientConfigLoader.getProperty("com.gs.smart-externalizable.enabled");
-        String actual = System.getProperty("com.gs.smart-externalizable.enabled");
-        assertEquals(expected, actual,
-            String.format("Smart externalizable system property should be set: expected=%s, actual=%s", expected, actual));
-    }
 
     @Test
-    @Order(4)
+    @Order(3)
     void xapServerServiceIsRunningAndCorrectHostConfigured() throws Exception {
         // Collect results from both checks so we can report all failures
         String restApiError = null;

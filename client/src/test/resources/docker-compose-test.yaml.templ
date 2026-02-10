@@ -2,10 +2,16 @@ services:
   xap-server:
     image: gigaspaces/smart-cache-enterprise:${gsServerVersion}
     command: host run-agent --manager --gsc=${numberOfPartitions}
+    volumes:
+      - ${bindMountHostDir}:/opt/gigaspaces/logs
+      #- /home/dixson/data/work:/opt/work  # avoids a java.io.FileNotFoundException when setting user id
+      #- /home/dixson/data/deploy:/opt/deploy # same as above
+    # user: "${USER_ID}:${GROUP_ID}"
     environment:
       GS_LICENSE: "tryme"
       GS_NIC_ADDRESS: "#local:ip#"
       GS_OPTIONS_EXT: "-Dcom.gs.smart-externalizable.enabled=${com.gs.smart-externalizable.enabled}"
+      # -Dcom.gs.deploy=/opt/deploy -Dcom.gs.work=/opt/work"
     network_mode: host  # Use this as communication may occur on non-standard ports
 #    ports:
 #      - "8090:8090"

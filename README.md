@@ -2,26 +2,29 @@
 
 
 ##### GigaSpaces server version
-1. Set the GigasSpaces server version used by docker-compose. Refer to `gigaspaces/smart-cache-enterprise:<version>`.
-   [docker-compose-test.yaml.templ](client/src/test/resources/docker-compose-test.yaml.templ)
+1. Set the GigasSpaces server version used by docker-compose.
+    * In [config.properties](config.properties) set `gsServerVersion`
+    * This sets the version `gigaspaces/smart-cache-enterprise:<version>` in [docker-compose.yaml](client/src/test/resources/docker-compose-test.yaml) by way of [template](client/src/test/resources/docker-compose-test.yaml.templ)
+    * Set the appropriate lookup group `xapLookupGroups`, also in the `config.properties`.
 
 ##### GigaSpaces client version
-1. Set the `gigaspaces.client.version` in the main `pom.xml`.
+1. Set the GigaSpaces client version
+    * In [config.properties](config.properties) set `gsClientVersion`.
+    * This sets `gigaspaces.client.version` in the main [pom.xml](pom.xml) through the [pom.xml template](pom.xml.tepmpl).
 
 ##### Client Java version
-1. The pom.xml contains the `maven.compiler.source` and `maven.compiler.target`. 
-2. The Java version of the client is determined by the JVM used to run the tests in scripts/runTests.sh.
+1. In [config.properties](config.properties) set the `mavenCompilerJdkVersion` to control the `maven.compiler.source` and `maven.compiler.target` in the pom.xml.
 
-Note: The Java server version is determined by the GigaSpaces docker image `gigaspaces/smart-cache-enterprise`.
+Note: The client JVM version is determined by the JVM chosen in [scripts/runTess.sh](scripts/runTests.sh).
+Note: The Java server version is determined by what version of Java the GigaSpaces docker image `gigaspaces/smart-cache-enterprise` is built on top of.
 
 ##### Execution flow
-1. The [preprocessor](preprocessor/src/main/java/com/gigaspaces/demo/Main.java) is responsible for replacing placeholders and generating configuration files.  
+1. Run the test at [scripts/runTests.sh](scripts/runTests.sh)
+2. The [preprocessor](preprocessor/src/main/java/com/gigaspaces/demo/Main.java) is responsible for replacing placeholders and generating configuration files.  
    The placeholders are defined in [config.properties](config.properties)
    This module is compiled before getting run.
-2. The build of the tests is run. A second build is done because step 1 will modify source configuration files. It also needs to create the pu.jar and copy the dependencies needed to run the JUnit test.
-3. The tests are run.  
-   See:  
-   [scripts/runTests.sh](scripts/runTests.sh)
+3. The build of the tests is run. A second build is done because step 1 will modify source configuration files. It also needs to create the pu.jar and copy the dependencies needed to run the JUnit test.
+4. The tests are run.
 
 
 ##### Limitations / Design consideration
