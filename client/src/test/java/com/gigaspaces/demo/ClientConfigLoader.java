@@ -43,7 +43,7 @@ public class ClientConfigLoader {
         // Use System.out.println as logger is dependent upon the logger that was bundled with gigaspaces
         // logger dependencies have changed, for example from 16.x - 17.x
         System.out.println("=".repeat(60));
-        System.out.println("TEST CLIENT CONFIGURATION SUMMARY");
+        System.out.println("CLIENT TEST CONFIGURATION SUMMARY");
         System.out.println("=".repeat(60));
         properties.stringPropertyNames().stream()
                 .sorted()

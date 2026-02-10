@@ -25,6 +25,7 @@ function build() {
   # mvn test -DIntegrationSuite
   # This will build, compile tests, but skip running them
   # -Dgigaspaces.client.version=17.1.4
+  mvn clean
   mvn test-compile
   # -DskipTests
   # The following is needed to make sure pu.jar is created
@@ -39,7 +40,7 @@ function runTest() {
 
   $JAVA_HOME/bin/java -cp "client/target/test-classes:client/target/classes:common/target/classes:client/target/test-libs/*" \
       org.junit.platform.console.ConsoleLauncher execute \
-      --select-class=com.gigaspaces.demo.IntegrationTestSuite
+      --select-class=com.gigaspaces.demo.ParentTestSuite
 
 }
 

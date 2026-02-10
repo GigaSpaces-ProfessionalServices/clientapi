@@ -30,6 +30,11 @@ public class CleanupTest {
 
     @Test
     @Order(1)
+    void clearProperties() {
+        ClientConfigLoader.clearSystemProperties();
+    }
+    @Test
+    @Order(2)
     void undeployPu() throws Exception {
         String baseUrl = DockerTestEnv.getInstance().getManagerBaseUrl();
         String undeployUrl = baseUrl + "/v2/pus/" + DockerTestEnv.PU_NAME;
@@ -41,7 +46,7 @@ public class CleanupTest {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void stopEnvironment() {
         DockerTestEnv.getInstance().stop();
         assertTrue(!DockerTestEnv.getInstance().isStarted(), "Environment should be stopped");

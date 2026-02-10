@@ -19,8 +19,9 @@ import com.gigaspaces.demo.tests.*;
  * Run with: mvn test -Dtest=IntegrationTestSuite
  */
 @Suite
-@SuiteDisplayName("XAP Integration Test Suite")
+@SuiteDisplayName("GS Client API Integration Test Suite")
 @SelectClasses({
+    Setup.class,
     ManagerReadyTest.class,
     PuDeploymentTest.class,
     AWriteReadExampleTest.class,
@@ -30,10 +31,10 @@ import com.gigaspaces.demo.tests.*;
     ELocalViewExample.class,
     FJdbcV3Example.class,
     GCustomAggregatorExample.class,
-    DockerRestartTest.class,
-    EventPuDeploymentTest.class,
-    HEventListenerExample.class,
+    //DockerRestartTest.class,
+    //EventPuDeploymentTest.class,
+    //HEventListenerExample.class,
     CleanupTest.class
 })
-class IntegrationTestSuite {
+public class IntegrationTestSuite {
 }

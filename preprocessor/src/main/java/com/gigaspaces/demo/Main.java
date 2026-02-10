@@ -15,20 +15,32 @@ import java.util.stream.Stream;
    This class is used to manage configurations that are related and may require configuration in multiple files.
  */
 public class Main {
+    public static final String BIND_MNT_HOST_DIR = "bindMountHostDir";
     public static final String SMART_EXTERNALIZABLE = "com.gs.smart-externalizable.enabled";
-    public static final String NUM_PARTITIONS = "numberOfPartitions";
+    public static final String GS_CLIENT_VERSION = "gsClientVersion";
     public static final String GS_SERVER_VERSION = "gsServerVersion";
+    public static final String MAVEN_COMPILER_JDK_VERSION = "mavenCompilerJdkVersion";
+    public static final String NUM_PARTITIONS = "numberOfPartitions";
     public static final String XAP_LOOKUP_GROUPS = "xapLookupGroups";
     private Path projectHome;
     private Path configFilePath;
     private Properties properties = new Properties();
     String dockerComposeTest = "";
     String testConfig = "";
+    String projectPom = "";
 
-    private void processSmartExternalizable(String smartExternalizableReplaceValue) {
+    private void processBindMountHostDir(String bindMountHostDirReplaceValue) {
         // 1. docker-compose-test.yaml
         dockerComposeTest = generateFile("client/src/test/resources/docker-compose-test.yaml.templ",
                 "client/src/test/resources/docker-compose-test.yaml", null,
+                BIND_MNT_HOST_DIR, bindMountHostDirReplaceValue);
+
+    }
+
+    private void processSmartExternalizable(String smartExternalizableReplaceValue) {
+        // 1. docker-compose-test.yaml
+        dockerComposeTest = generateFile(null,
+                "client/src/test/resources/docker-compose-test.yaml", dockerComposeTest,
                 SMART_EXTERNALIZABLE, smartExternalizableReplaceValue);
         // 2. test-config.properties
         testConfig = generateFile("client/src/test/resources/test-config.properties.templ",
@@ -36,11 +48,23 @@ public class Main {
                 SMART_EXTERNALIZABLE, smartExternalizableReplaceValue);
 
     }
+    private void processGsClientVersion(String gsClientVersionReplaceValue) {
+        // 1. pom.xml
+        projectPom = generateFile("pom.xml.templ",
+                "pom.xml", null,
+                GS_CLIENT_VERSION, gsClientVersionReplaceValue);
+    }
     private void processGsServerVersion(String gsServerVersionValue) {
         // 1. docker-compose-test.yaml
         dockerComposeTest = generateFile(null,
                 "client/src/test/resources/docker-compose-test.yaml", dockerComposeTest,
                 GS_SERVER_VERSION, gsServerVersionValue);
+    }
+    private void processMavenCompilerJdkVersion(String mavenCompilerJdkVersionValue) {
+        // 1. pom.xml
+        projectPom = generateFile(null,
+                "pom.xml", projectPom,
+                MAVEN_COMPILER_JDK_VERSION, mavenCompilerJdkVersionValue);
     }
     private void processNumberOfPartitions(String numberOfPartitionsReplaceValue) {
         // 1. docker-compose-test.yaml
@@ -118,10 +142,16 @@ public class Main {
 
             String value = (String) properties.getProperty(key);
             //System.out.println(String.format("  <K,V>: %s, %s", key, value));
-            if (SMART_EXTERNALIZABLE.equals(key)) {
+            if (BIND_MNT_HOST_DIR.equals(key)) {
+                processBindMountHostDir(value);
+            } else if (SMART_EXTERNALIZABLE.equals(key)) {
                 processSmartExternalizable(value);
+            } else if (GS_CLIENT_VERSION.equals(key)) {
+                processGsClientVersion(value);
             } else if (GS_SERVER_VERSION.equals(key)) {
                 processGsServerVersion(value);
+            } else if (MAVEN_COMPILER_JDK_VERSION.equals(key)) {
+                processMavenCompilerJdkVersion(value);
             } else if (NUM_PARTITIONS.equals(key)) {
                 processNumberOfPartitions(value);
             } else if (XAP_LOOKUP_GROUPS.equals(key)) {
