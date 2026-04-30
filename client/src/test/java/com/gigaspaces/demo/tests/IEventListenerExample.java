@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(RemoteProxyExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class HEventListenerExample {
+public class IEventListenerExample {
     private GigaSpace gigaSpace;
     private static final int NUM_RECORDS = 10;
 

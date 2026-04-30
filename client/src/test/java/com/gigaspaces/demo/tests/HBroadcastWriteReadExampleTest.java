@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(RemoteProxyExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class IBroadcastWriteReadExampleTest {
+public class HBroadcastWriteReadExampleTest {
 
     private GigaSpace gigaSpace;
     private BroadcastWriteReadExample broadcastWriteReadExample;
